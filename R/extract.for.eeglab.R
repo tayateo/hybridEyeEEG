@@ -1,0 +1,182 @@
+extract.actions <- function(filename, new.block.diff = T)
+  
+  #sSearchRegion - to foem interval  sSearchRegion +/- saccade latency to search in, in seconds
+{
+  #with this function you can extract existing messages and timestamps 
+  #from an edf file
+  
+  lines <- load.edf(sprintf("%s.edf",filename))
+  
+  sRate <- as.numeric((str_filter(lines, '^SAMPLES.+RATE\\t([[:digit:]]+)'))[[1]][[2]])
+  fixation.duration <- as.numeric((str_filter(lines, '.+fixationDuration\":([[:digit:]]+)'))[[1]][[2]])
+  
+  blockedMove <- str_filter(lines, '^MSG.+"blockedMove".+time += ([[:digit:]]+)')
+  SRfix <- str_filter(lines, 'SFIX.+ ([[:digit:]]+)')
+  endSac <- str_filter(lines, 'ESACC.+ [[:digit:]]+\\t([[:digit:]]+)')
+  button.press <- str_filter(lines, '^MSG.+"ClickedToUnlock".+time += ([[:digit:]]+)')
+  ball.choose <- str_filter(lines, '^MSG.+"ballSelect".+time += ([[:digit:]]+)')
+  fix.event <- str_filter(lines, '^MSG.+fixation in region.+time += ([[:digit:]]+)')
+ 
+
+  ball.move <-  str_filter(lines, '^MSG.+"ballMove".+time += ([[:digit:]]+)')
+  ReachedMaximumMovesQuantity <- str_filter(lines, '^MSG.+"ReachedMaximumMovesQuantity".+time += ([[:digit:]]+)')
+  
+  first_sync <- edf.sync(lines)
+  
+  #taking timestamps of all events ends
+  #here we are taking the third synchronization bit to use
+  #it as the reference point in eeg file
+    
+  button.times <- extr.num(button.press, first_sync, fixation.duration, sRate)
+  ball.times <- extr.num(ball.choose , first_sync, fixation.duration, sRate)
+  fix.times <- extr.num(fix.event , first_sync, fixation.duration, sRate)
+  ball.move.times <- extr.num(ball.move , first_sync, fixation.duration, sRate)
+  max.reached.times <-extr.num(ReachedMaximumMovesQuantity , first_sync, fixation.duration, sRate)
+  SRfix.times <- extr.num(SRfix , first_sync, fixation.duration, sRate)
+  endSac.times <- extr.num(endSac , first_sync, fixation.duration, sRate)
+  blockedMove.times <- extr.num(blockedMove , first_sync, fixation.duration, sRate)
+  
+  
+  for.eeglab <- data.frame(Latency = c(button.times,ball.times,
+                                       ball.move.times, max.reached.times),
+                           Type = c(rep("msgbuttonPressed", length(button.times)), 
+                                    rep("msgballChosen", length(ball.times)),
+                                    rep("msgBallMoved", length(ball.move.times)),
+                                    rep("ReachedMax", length(max.reached.times))))
+  
+  for.eeglab <- for.eeglab[order(for.eeglab$Latency),]
+  for.eeglab$Type <- sapply(for.eeglab$Type, as.character)
+  for (i in 1:(nrow(for.eeglab)-1))
+  {
+    if (for.eeglab$Type[i] == "msgballChosen" 
+        && for.eeglab$Type[i+1] == "msgballChosen" )
+    {
+      for.eeglab$Type[i] = "errorBallChosen" 
+    }
+  }
+ 
+  if(new.block.diff==F)
+  {
+    BoardPositionClickedInBlockedMode <- str_filter(lines, '^MSG.+"BoardPositionClickedInBlockedMode".+time += ([[:digit:]]+)')
+    clicked.in.blocked.mode <- extr.num(BoardPositionClickedInBlockedMode , first_sync, fixation.duration, sRate)
+    if(length(clicked.in.blocked.mode)!=0)
+    {
+      for.eeglab <- rbind(for.eeglab, data.frame(Latency = clicked.in.blocked.mode, Type = rep("msgClickedInBlockMode", length(clicked.in.blocked.mode))))
+    }
+  }
+  else
+  {
+    ball_in_blocked <- str_filter(lines, '^MSG.+"BallClickedInBlockedMode".+time += ([[:digit:]]+)')
+    board_in_blocked <- str_filter(lines, '^MSG.+"BoardClickedInBlockedMode".+time += ([[:digit:]]+)')
+    ball_in_blocked <- extr.num( ball_in_blocked , first_sync, fixation.duration, sRate)
+    board_in_blocked <- extr.num( board_in_blocked , first_sync, fixation.duration, sRate)
+    if(length(ball_in_blocked)!=0)
+    {
+      for.eeglab <- rbind(for.eeglab, data.frame(Latency = ball_in_blocked, Type = rep("msgBallClickedInBlockedMode", length(ball_in_blocked))))  
+    }
+    else if(length(board_in_blocked)!=0)
+    {
+      for.eeglab <- rbind(for.eeglab, data.frame(Latency = board_in_blocked, Type = rep("msgBoardClickedInBlockedMode", length(board_in_blocked))))
+    }
+  }
+  
+  if(length(blockedMove.times)!=0)
+  {
+    for.eeglab <- rbind(for.eeglab, data.frame(Latency = blockedMove.times, Type = rep("msgImpossibleMove", length(blockedMove.times))))
+  }
+  
+
+  
+  for.eeglab = rbind(for.eeglab, data.frame(Latency = c(SRfix.times,endSac.times,fix.times),
+                     Type = c(rep("SRfix", length(SRfix.times)),
+                     rep("SRSaccEnd", length(endSac.times)),
+                     rep("FixationStart", length(fix.times)))))
+
+  for.eeglab <- for.eeglab[order(for.eeglab$Latency),]
+  
+  for.eeglab <- subset(for.eeglab, Latency >=0)
+
+  #for.eeglab <- extract.saccades(for.eeglab, 0.1)
+
+  
+  
+  write.table(for.eeglab, sprintf('eventsLatencies%s.ascii', filename), row.names = F, quote = F)
+  
+  return(for.eeglab)
+  
+}
+
+chooseSacc <- function()
+{
+  fixes <- subset(temp, Type == "FixationStart")$Latency
+  
+  needSaccend <- numeric()
+  for (i in 1:length(fixes))
+  {
+    prevSaccEnd <- temp[(which(temp$Latency == fixes[i]))-1,1]
+    nextSaccEnd <- temp[(which(temp$Latency == fixes[i]))+1,1]
+    diffPrev <- abs(fixes[i] - prevSaccEnd)
+    diffNext <- abs(fixes[i] - nextSaccEnd)
+    if(diffPrev<diffNext)
+    {
+      needSaccend[i] <- prevSaccEnd
+      print("prev")
+    }
+    else
+    {
+      needSaccend[i] <- nextSaccEnd
+      print("next")
+    }
+    
+    return(needSaccend)
+  }
+  
+}
+
+extract.saccades <- function(for.eeglab, dur)
+{
+  saccs <- unlist(subset(for.eeglab, Type == "SRSaccEnd", select = "Latency"), use.names = F)
+  msgs <-  unlist(subset(for.eeglab,  Type!="SRfix" & Type != "FixationStart" & Type != "ReachedMax" & Type != "SRSaccEnd", select = "Latency"), use.names = F)
+  selected <- numeric()
+  
+  for (i in 1:length(saccs))
+  {
+    interval <- seq(saccs[i]-dur,saccs[i]+dur, 0.001)
+    if(sum(msgs %in% interval))
+    {
+      selected[i] <- saccs[i]
+    }
+  }
+  selected <- selected[!is.na(selected)]
+  
+  for.eeglab <- rbind(for.eeglab, data.frame(Latency = selected, Type = rep("selectedSacc", length(selected))))
+  for.eeglab <- for.eeglab[order(for.eeglab$Latency),]
+  
+  return(for.eeglab)
+}
+
+mark.saccades <- function(for.eeglab)
+{
+  #mark saccades in accordance with ongoing msg
+  temp2 <- subset(for.eeglab, Type!="SRSaccEnd" & Type!="SRfix" & Type != "FixationStart" & Type != "ReachedMax")
+  tempRest <- subset(for.eeglab, Type=="SRSaccEnd" | Type == "SRfix" | Type == "FixationStart" | Type == "ReachedMax")
+  names <- levels(temp2$Type)[temp2$Type]
+  
+  for(i in (which(names=="selectedSacc")))
+  {
+    if(grepl('msg', names[i+1]))
+    {
+      names[i] <- sprintf("%sBefore%s", names[i], gsub("msg", "", names[i+1]))
+    }
+  }
+  temp2$Type = names
+  
+  for.eeglab <- rbind(temp2, tempRest)
+  for.eeglab <- for.eeglab[order(for.eeglab$Latency),]
+}
+
+extr.num <- function(extr, first_sync, fixation.duration, sRate)
+{
+  ans <- sapply(extr, function(i) (as.numeric(i[[2]])- first_sync - fixation.duration)/sRate);
+  return(ans)
+}

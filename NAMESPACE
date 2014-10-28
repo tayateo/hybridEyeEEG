@@ -1,0 +1,8 @@
+exportPattern("^[[:alpha:]]+")
+import(bcidat)
+import(stringr)
+import(signal)
+import(doParallel)
+import(abind)
+import(ggplot2)
+import(gridExtra)
