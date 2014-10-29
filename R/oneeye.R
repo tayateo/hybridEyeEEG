@@ -1,9 +1,4 @@
-
-#' Load eyetracking data for single-eye recordings
-#'
-#' @param fileName Name of EDF file
-#' @return 
-load.one.eye <- function(fileName){
+  load.one.eye <- function(fileName){
   data <- read.edf(fileName)
   if(is.null(data)) stop("Can't read EDF file")
   

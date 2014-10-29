@@ -1,14 +1,19 @@
+#'Checks synchronization between EDF and DAT files
+#'
+#'Computes differenece between every two synchronization points in the beggining and in the end of two files
+#'
+#'@param edffile an .edf file name without an extesion
+#'@param eegfile a .dat file name without an extesion
+#'
+#'@return
+#'a table with all sync points and their timestamps for both files.
+#'Also saves the same table to asc file with a corresponding name.
 
-check.sync <- function(exp)
+check.sync <- function(edffile, eegfile)
 {
-  time.and.type <- data.frame()
-  for (files in exp)
-  {
+    time.and.type <- data.frame()
     
-    edffile <- files$edffile
-    eegfile <- files$eegfile
-    
-    
+      
     lines <- load.edf(sprintf("%s.edf",edffile))
     eeg <- load_bcidat(sprintf("%s.dat",eegfile)) 
     
@@ -49,9 +54,9 @@ check.sync <- function(exp)
                 quote = F)
     
     time.and.type <- rbind(time.and.type, df.edf, df.eeg)
-  }
   
-write.table(time.and.type, file = "sync_table.asc", row.names = F, quote = F)
-return(time.and.type)
+  write.table(time.and.type, file = sprintf("sync_table-%s-%s.asc", edffile, eegfile), row.names = F, quote = F)
+  
+  return(time.and.type)
 
 }
