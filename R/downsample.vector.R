@@ -7,6 +7,16 @@ downsample.vector <- function(vect, q)
   
   dec.vect <- decimate(v.withoutNA$vect, q)
   
-
+  d <- diff(v.withoutNA$t)
+  
+  for(i in 1:length(d))
+  {
+    if(d[i] != 1)
+    {
+      dec.vect <- append(dec.vect, rep(NA, floor(d[i]/q)), floor(i/q))
+    }
+  }
+  
+  return(dec.vect)
   
 }
