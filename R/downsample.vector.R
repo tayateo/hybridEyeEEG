@@ -13,7 +13,7 @@ downsample.vector <- function(vect, q)
   {
     if(d[i] != 1)
     {
-      dec.vect <- append(dec.vect, rep(NA, floor(d[i]/q)), floor(i/q))
+      dec.vect <- append(dec.vect, rep(NA, floor(d[i]/q)), ceiling(i/q))
     }
   }
   
