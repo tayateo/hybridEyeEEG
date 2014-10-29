@@ -1,12 +1,12 @@
 Package: hybridEyeEEG
 Type: Package
-Title: What the package does (short line)
-Version: 1.0
+Title: Works with eyelink data files and bci2000 data files
 Date: 2014-10-01
-Author: Who wrote it
-Maintainer: Who to complain to <yourfault@somewhere.net>
-Description: More about what it does (maybe more than one line)
-License: What license is it under?
+Author: Anastasia Fedorova, Urii Nuzhdin
+Maintainer: mayenok@gmail.com
+Description: Various function that are used in experiments for developping hybrid BCI, based on EEG registration and eyetracking
+in Laboratory for Neuroergonomics and brain-computer interfaces of Kurchatov Institute (Moscow)
+License: GPL
 Imports:
     stringr (>= 0.6.2),
     abind (>= 1.4-0),
