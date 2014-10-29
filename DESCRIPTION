@@ -1,15 +1,15 @@
 Package: hybridEyeEEG
 Type: Package
-Title: What the package does (short line)
-Version: 1.0
+Title: Different operations with EDF (eyelink data files) and DAT (bci2000 data files)
+Version: 0.5.1
 Date: 2014-10-01
-Author: Who wrote it
-Maintainer: Who to complain to <yourfault@somewhere.net>
-Description: More about what it does (maybe more than one line)
-License: What license is it under?
+Author: Anastasia Fedorova, Urii Nuzhdin
+Maintainer: <mayenok@gmail.com>
+Description: Differrent functions for data processing in experiments with hybrid BCI, containing EEG recording and eyetracking, that are developped in laboratory for neuroergonomics and brain-computer interfaces of Kurchatov Institute (Moscow)
+License: GPL
 Imports:
     stringr (>= 0.6.2),
-    abind (>= 1.4-0),
+    abind (>= 1.4-0)
 Depends:
     ggplot2,
     gridExtra,
