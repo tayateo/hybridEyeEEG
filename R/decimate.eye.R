@@ -5,9 +5,9 @@ decimate.eye <- function(filename, q, old = F, fixation.duration = NULL)
 
   ans <- load.one.eye(filename)
   points <- ans$samples
-  decimated.points <- data.frame(x = downsample.vector(points$x, q),
-                                 y = downsample.vector(points$y, q),
-                                 pupil = downsample.vector(points$pupil, q))
+  decimated.points <- data.frame(x = decimate.with.na(points$x, q),
+                                 y = decimate.with.na(points$y, q),
+                                 pupil = decimate.with.na(points$pupil, q))
   
   #write.table
   
