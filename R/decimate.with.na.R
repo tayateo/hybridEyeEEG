@@ -9,7 +9,10 @@
 #'@param n filter order used in the downsampling.
 #'@param ftype filter type, "iir" or "fir"
 #'
-#'@example decimate.with.na(x, q)
+#'@examples
+#'decimate.with.na(x, q)
+#'
+#'@author Nuzhdin Urii, Anastasia Fedorova
 
 decimate.with.na <- function(vect, q, n = if (ftype == "iir") 8 else 30, ftype = "iir")
 {
