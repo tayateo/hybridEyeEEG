@@ -2,7 +2,7 @@
 #' 
 #' @param filename - name of a file with extension
 #' @param q - integer factor to downsample by. E.g. if your file's sampling rate is 1000 Hz and you want to downsample it to 500 Hz, q should equal "2".
-#' @param na.code - string to replace NAs in a table. NAs values in data stand for blinks.
+#' @param na.code - a value to replace NAs in a table. NAs values in data stand for blinks.
 #' 
 #' @examples
 #' decimate.eye('23566333.edf', 2)

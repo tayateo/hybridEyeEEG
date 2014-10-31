@@ -10,7 +10,7 @@ decimate.eye(filename, q, na.code = "NaN")
 
 \item{q}{- integer factor to downsample by. E.g. if your file's sampling rate is 1000 Hz and you want to downsample it to 500 Hz, q should equal "2".}
 
-\item{na.code}{- string to replace NAs in a table. NAs values in data stand for blinks.}
+\item{na.code}{- a value to replace NAs in a table. NAs values in data stand for blinks.}
 }
 \value{
 Writes a table to a working derictory in ascii format compatible with EEGlab
