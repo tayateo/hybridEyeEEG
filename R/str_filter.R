@@ -1,3 +1,4 @@
+#
 str_filter <- function(list, regexp)
 {  
   short <- list[str_detect(list, regexp)]
