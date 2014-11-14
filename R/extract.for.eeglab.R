@@ -7,7 +7,7 @@ extract.actions <- function(filename, new.block.diff = T)
   
   lines <- load.edf(sprintf("%s.edf",filename))
   
-  sRate <- as.numeric((str_filter(lines, '^SAMPLES.+RATE\\t([[:digit:]]+)'))[[1]][[2]])
+  sRate <- as.numeric((str_filter(lines, '^SAMPLES.+RATE\\t *([[:digit:]]+)'))[[1]][[2]])
   fixation.duration <- as.numeric((str_filter(lines, '.+fixationDuration\":([[:digit:]]+)'))[[1]][[2]])
   
   blockedMove <- str_filter(lines, '^MSG.+"blockedMove".+time += ([[:digit:]]+)')
