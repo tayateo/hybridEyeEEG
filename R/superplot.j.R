@@ -17,8 +17,8 @@ superplot.j <- function(filename, fixation.duration, t1 = -2000, t2 = 2000)
   str= '^MSG\\t([[:digit:]]+).+fixation in region.center.x'
 
   speedAroundFixation<- t(epocher.speed(str, t1, t2, 
-                                        first_sync, fixation.duration,
-                                        points, lines, timestamps = TRUE))
+                                        fixation.duration,
+                                        points, lines, timestamps = TRUE, first_sync))
   
   
   t <- t1:(fixation.duration+t2)
