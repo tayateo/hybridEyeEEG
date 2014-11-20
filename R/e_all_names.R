@@ -131,6 +131,16 @@ diff.block.all <- function(exp)
   }
 }
 
+
+new.plot.all <- function(exp)
+{
+  for(files in exp)
+  {
+    new.plot.epo(files$edffile, files$eegfile, 'btn', 'ball')
+  }
+}
+
+
 #for check.sync
 
 
@@ -158,6 +168,7 @@ files205 <- list(
   list(edffile = "23598136", eegfile = "e205S001R06"),
   list(edffile = "23598144", eegfile = "e205S001R07"))
 
+
 files103 <- list(
   list(edffile = "23476936", eegfile = "e103S001R07"),
   list(edffile = "23476943", eegfile = "e103S001R08"),
@@ -166,7 +177,7 @@ files103 <- list(
   list(edffile = "23476900", eegfile = "e103S001R02"),
   list(edffile = "23476916", eegfile = "e103S001R05"),
   list(edffile = "23476925", eegfile = "e103S001R06"))
-  
+
 
 files105 <- list(
   list(edffile = "23478296", eegfile = "e105S001R06"),

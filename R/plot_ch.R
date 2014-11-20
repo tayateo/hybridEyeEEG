@@ -1,4 +1,4 @@
-plot_ch <- function(df, name, ylimMin = -10, ylimMax = 10)
+plot_ch <- function(df, name, ylimMin = -20, ylimMax = 20)
 {
   
   pl <- ggplot(df, aes_string(x="t", y=name, colour="mode"))+
