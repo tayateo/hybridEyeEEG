@@ -11,12 +11,12 @@ superplot <- function(filename, str, t1 = -2000, t2 = 2000)
 #   'inBlocked - btn'
   
   
-  lines <- load.edf(sprintf("%s.edf",filename))
+  ans <- load.one.eye(sprintf("%s.edf",filename))
   
-  ans <- extract.samples(lines)
-  points <- ans$points[,c(1,2,3)]
-  first_sync <- ans$first_sync
-  fixation.duration <- ans$fixation.duration
+  points <- ans$samples
+  lines <- ans$events$message
+  sync_point <- ans$sync_timestamp
+  fixation.duration <- as.numeric((str_filter(lines, 'fixationDuration.+:([[:digit:]]+)'))[[1]][[2]])
   
   
   speed.of.eye <- c(sqrt( (diff(points[,2])^2) + (diff(points[,3])^2) ), 0)
@@ -27,17 +27,28 @@ superplot <- function(filename, str, t1 = -2000, t2 = 2000)
   type = str
   
   switch(str,
-         fixation = {str = '^MSG.+ fixation in region.center.x.+time = +([[:digit:]]+)'},
-         btn = {str = '^MSG.+"ClickedToUnlock".+time += ([[:digit:]]+)'},
-         ball = {str = '^MSG.+"ballSelect".+time += ([[:digit:]]+)'},
-         moveTo = {str = '^MSG.+"ballMove".+time += ([[:digit:]]+)'},
-         inBlocked = {str = '^MSG.+"BoardPositionClickedInBlockedMode".+time += ([[:digit:]]+)'},
-         block_ball = {str = '^MSG.+"BallClickedInBlockedMode".+time += ([[:digit:]]+)'},
-         block_board = {str = '^MSG.+"BoardClickedInBlockedMode".+time += ([[:digit:]]+)'})
+         fixation = {str = 'fixation in region.center.x.+time = +([[:digit:]]+)'},
+         btn = {str = '"ClickedToUnlock".+time += ([[:digit:]]+)'},
+         ball = {str = '"ballSelect".+time += ([[:digit:]]+)'},
+         moveTo = {str = '"ballMove".+time += ([[:digit:]]+)'},
+         inBlocked = {str = '"BoardPositionClickedInBlockedMode".+time += ([[:digit:]]+)'},
+         block_ball = {str = '"BallClickedInBlockedMode".+time += ([[:digit:]]+)'},
+         block_board = {str = '"BoardClickedInBlockedMode".+time += ([[:digit:]]+)'})
 
-  speedAroundFixation<- t(epocher.speed(str, t1, t2, 
-                                        first_sync, fixation.duration,
-                                        points, lines, timestamps = TRUE))
+  speedAroundFixation <- (epocher.speed(str, t1, t2, 
+                                      fixation.duration,
+                                      points, lines, timestamps = TRUE, 
+                                      sync_point))
+  
+  if(is.null(speedAroundFixation))
+  {
+    return
+  }
+  else
+  {
+    speedAroundFixation <- t( speedAroundFixation )
+  }
+  
   
   
   t <- t1:(fixation.duration+t2)

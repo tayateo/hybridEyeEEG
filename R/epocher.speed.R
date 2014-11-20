@@ -1,8 +1,12 @@
-epocher.speed <- function(string, t1, t2, first_sync, fixation.duration, points, lines, timestamps = F)
+epocher.speed <- function(string, t1, t2, fixation.duration, points, lines, timestamps = F, sync_point)
 {
   #extracting timestamps of all "button press" events from the file
   event <- str_filter(lines, string)
-  times <- sapply(event, function(i) as.numeric(i[[2]])- first_sync - fixation.duration);
+  if(length(event) == 0)
+  {
+    return(NULL)
+  }
+  times <- sapply(event, function(i) as.numeric(i[[2]]) - fixation.duration - sync_point);
   
   #ceating an empty two-dimensional array that will be filled with pupil diameters
   

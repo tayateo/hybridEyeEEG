@@ -13,9 +13,13 @@ extract.actions <- function(filename, new.block.diff = T)
   blockedMove <- str_filter(lines, '^MSG.+"blockedMove".+time += ([[:digit:]]+)')
   SRfix <- str_filter(lines, 'SFIX.+ ([[:digit:]]+)')
   endSac <- str_filter(lines, 'ESACC.+ [[:digit:]]+\\t([[:digit:]]+)')
+  startSac <- str_filter(lines, 'SSACC.+ ([[:digit:]]+)')
   button.press <- str_filter(lines, '^MSG.+"ClickedToUnlock".+time += ([[:digit:]]+)')
   ball.choose <- str_filter(lines, '^MSG.+"ballSelect".+time += ([[:digit:]]+)')
   fix.event <- str_filter(lines, '^MSG.+fixation in region.+time += ([[:digit:]]+)')
+  random.block.starts <- str_filter(lines, '^MSG.+"random_block_starts".+time += ([[:digit:]]+)')
+  random.block.ends <- str_filter(lines, '^MSG.+"random_block_ends".+time += ([[:digit:]]+)')
+  
  
 
   ball.move <-  str_filter(lines, '^MSG.+"ballMove".+time += ([[:digit:]]+)')
@@ -31,10 +35,18 @@ extract.actions <- function(filename, new.block.diff = T)
   ball.times <- extr.num(ball.choose , first_sync, fixation.duration, sRate)
   fix.times <- extr.num(fix.event , first_sync, fixation.duration, sRate)
   ball.move.times <- extr.num(ball.move , first_sync, fixation.duration, sRate)
-  max.reached.times <-extr.num(ReachedMaximumMovesQuantity , first_sync, fixation.duration, sRate)
-  SRfix.times <- extr.num(SRfix , first_sync, fixation.duration, sRate)
-  endSac.times <- extr.num(endSac , first_sync, fixation.duration, sRate)
+  max.reached.times <-sapply(ReachedMaximumMovesQuantity, function(i) (as.numeric(i[[2]])- first_sync)/sRate)
   blockedMove.times <- extr.num(blockedMove , first_sync, fixation.duration, sRate)
+  
+  random.block.starts <- sapply(random.block.starts, function(i) (as.numeric(i[[2]])- first_sync)/sRate)
+  random.block.ends <- sapply(random.block.ends, function(i) (as.numeric(i[[2]])- first_sync)/sRate)
+  
+  #SR events
+  SRfix.times <- sapply(SRfix, function(i) (as.numeric(i[[2]])- first_sync)/sRate)
+  endSac.times <- sapply(endSac, function(i) (as.numeric(i[[2]])- first_sync)/sRate)
+  startSac.times <- sapply(startSac, function(i) (as.numeric(i[[2]])- first_sync)/sRate)
+  
+  
   
   
   for.eeglab <- data.frame(Latency = c(button.times,ball.times,
@@ -85,19 +97,27 @@ extract.actions <- function(filename, new.block.diff = T)
     for.eeglab <- rbind(for.eeglab, data.frame(Latency = blockedMove.times, Type = rep("msgImpossibleMove", length(blockedMove.times))))
   }
   
+  if(length(random.block.starts)!=0)
+  {
+    for.eeglab <- rbind(for.eeglab, data.frame(Latency = random.block.starts, Type = rep("random.block.starts", length(random.block.starts))))
+  }
+  if(length(random.block.ends)!=0)
+  {
+    for.eeglab <- rbind(for.eeglab, data.frame(Latency = random.block.ends, Type = rep("random.block.ends", length(random.block.ends))))
+  }
 
   
-  for.eeglab = rbind(for.eeglab, data.frame(Latency = c(SRfix.times,endSac.times,fix.times),
+  for.eeglab = rbind(for.eeglab, data.frame(Latency = c(SRfix.times,endSac.times,fix.times, SRfix.times),
                      Type = c(rep("SRfix", length(SRfix.times)),
                      rep("SRSaccEnd", length(endSac.times)),
-                     rep("FixationStart", length(fix.times)))))
+                     rep("FixationStart", length(fix.times)),
+                     rep("SRsaccStart", length(SRfix.times)))))
 
   for.eeglab <- for.eeglab[order(for.eeglab$Latency),]
   
   for.eeglab <- subset(for.eeglab, Latency >=0)
 
   #for.eeglab <- extract.saccades(for.eeglab, 0.1)
-
   
   
   write.table(for.eeglab, sprintf('eventsLatencies%s.ascii', filename), row.names = F, quote = F)

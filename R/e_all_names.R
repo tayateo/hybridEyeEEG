@@ -152,6 +152,12 @@ files204 <- list(
   list(edffile = "23566382", eegfile = "e204S001R04"),
   list(edffile = "23566390", eegfile = "e204S001R05"))
 
+files205 <- list(
+  list(edffile = "23598120", eegfile = "e205S001R04"),
+  list(edffile = "23598128", eegfile = "e205S001R05"),
+  list(edffile = "23598136", eegfile = "e205S001R06"),
+  list(edffile = "23598144", eegfile = "e205S001R07"))
+
 files103 <- list(
   list(edffile = "23476936", eegfile = "e103S001R07"),
   list(edffile = "23476943", eegfile = "e103S001R08"),

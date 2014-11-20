@@ -41,7 +41,8 @@
     samples = eyeData,
     events = events,
     samplingRate = data$begin$sampleRate,
-    experimentDur = timeLimit$end - timeLimit$begin
+    experimentDur = timeLimit$end - timeLimit$begin,
+    sync_timestamp = timeLimit$begin
     )
 }
 
