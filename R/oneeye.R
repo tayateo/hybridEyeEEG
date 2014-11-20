@@ -24,8 +24,8 @@
   }else{
     stop("There are two eyes recorded in file, waiting only one")
   }
-  
-  timeLimit <- checkSynchroPulses(getSynchroPulses(data));
+  pulses <- getSynchroPulses(data)
+  timeLimit <- checkSynchroPulses(pulses);
   
   # drop data
   eyeData <- eyeData[
@@ -42,7 +42,8 @@
     events = events,
     samplingRate = data$begin$sampleRate,
     experimentDur = timeLimit$end - timeLimit$begin,
-    sync_timestamp = timeLimit$begin
+    sync_timestamp = timeLimit$begin,
+    pulses = pulses
     )
 }
 
