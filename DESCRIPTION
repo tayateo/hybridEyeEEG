@@ -12,10 +12,10 @@ Description: Differrent functions for data processing in experiments with
     Kurchatov Institute (Moscow)
 License: GPL
 Imports:
-    stringr (>= 0.6.2),
-    abind (>= 1.4-0)
+    stringr (>= 0.6.2)
 Depends:
     ggplot2,
+    abind,
     gridExtra,
     bcidat,
     doParallel,

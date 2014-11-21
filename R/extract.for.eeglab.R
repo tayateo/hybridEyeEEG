@@ -5,27 +5,29 @@ extract.actions <- function(filename, new.block.diff = T)
   #with this function you can extract existing messages and timestamps 
   #from an edf file
   
-  lines <- load.edf(sprintf("%s.edf",filename))
+  ans <- load.one.eye(sprintf("%s.edf",filename))
   
-  sRate <- as.numeric((str_filter(lines, '^SAMPLES.+RATE\\t *([[:digit:]]+)'))[[1]][[2]])
+  lines <- ans$events$message
+  
+  sRate <- ans$samplingRate
   fixation.duration <- as.numeric((str_filter(lines, '.+fixationDuration\":([[:digit:]]+)'))[[1]][[2]])
   
-  blockedMove <- str_filter(lines, '^MSG.+"blockedMove".+time += ([[:digit:]]+)')
+  blockedMove <- str_filter(lines, '.+"blockedMove".+time += ([[:digit:]]+)')
   SRfix <- str_filter(lines, 'SFIX.+ ([[:digit:]]+)')
   endSac <- str_filter(lines, 'ESACC.+ [[:digit:]]+\\t([[:digit:]]+)')
   startSac <- str_filter(lines, 'SSACC.+ ([[:digit:]]+)')
-  button.press <- str_filter(lines, '^MSG.+"ClickedToUnlock".+time += ([[:digit:]]+)')
-  ball.choose <- str_filter(lines, '^MSG.+"ballSelect".+time += ([[:digit:]]+)')
-  fix.event <- str_filter(lines, '^MSG.+fixation in region.+time += ([[:digit:]]+)')
-  random.block.starts <- str_filter(lines, '^MSG.+"random_block_starts".+time += ([[:digit:]]+)')
-  random.block.ends <- str_filter(lines, '^MSG.+"random_block_ends".+time += ([[:digit:]]+)')
+  button.press <- str_filter(lines, '.+"ClickedToUnlock".+time += ([[:digit:]]+)')
+  ball.choose <- str_filter(lines, '.+"ballSelect".+time += ([[:digit:]]+)')
+  fix.event <- str_filter(lines, '.+fixation in region.+time += ([[:digit:]]+)')
+  random.block.starts <- str_filter(lines, '.+"random_block_starts".+time += ([[:digit:]]+)')
+  random.block.ends <- str_filter(lines, '.+"random_block_ends".+time += ([[:digit:]]+)')
   
  
 
-  ball.move <-  str_filter(lines, '^MSG.+"ballMove".+time += ([[:digit:]]+)')
-  ReachedMaximumMovesQuantity <- str_filter(lines, '^MSG.+"ReachedMaximumMovesQuantity".+time += ([[:digit:]]+)')
+  ball.move <-  str_filter(lines, '.+"ballMove".+time += ([[:digit:]]+)')
+  ReachedMaximumMovesQuantity <- str_filter(lines, '.+"ReachedMaximumMovesQuantity".+time += ([[:digit:]]+)')
   
-  first_sync <- edf.sync(lines)
+  first_sync <- ans$sync_timestamp
   
   #taking timestamps of all events ends
   #here we are taking the third synchronization bit to use
@@ -69,7 +71,7 @@ extract.actions <- function(filename, new.block.diff = T)
  
   if(new.block.diff==F)
   {
-    BoardPositionClickedInBlockedMode <- str_filter(lines, '^MSG.+"BoardPositionClickedInBlockedMode".+time += ([[:digit:]]+)')
+    BoardPositionClickedInBlockedMode <- str_filter(lines, '.+"BoardPositionClickedInBlockedMode".+time += ([[:digit:]]+)')
     clicked.in.blocked.mode <- extr.num(BoardPositionClickedInBlockedMode , first_sync, fixation.duration, sRate)
     if(length(clicked.in.blocked.mode)!=0)
     {
@@ -78,8 +80,8 @@ extract.actions <- function(filename, new.block.diff = T)
   }
   else
   {
-    ball_in_blocked <- str_filter(lines, '^MSG.+"BallClickedInBlockedMode".+time += ([[:digit:]]+)')
-    board_in_blocked <- str_filter(lines, '^MSG.+"BoardClickedInBlockedMode".+time += ([[:digit:]]+)')
+    ball_in_blocked <- str_filter(lines, '+"BallClickedInBlockedMode".+time += ([[:digit:]]+)')
+    board_in_blocked <- str_filter(lines, '+"BoardClickedInBlockedMode".+time += ([[:digit:]]+)')
     ball_in_blocked <- extr.num( ball_in_blocked , first_sync, fixation.duration, sRate)
     board_in_blocked <- extr.num( board_in_blocked , first_sync, fixation.duration, sRate)
     if(length(ball_in_blocked)!=0)

@@ -25,6 +25,13 @@ experiments <- list(
     edffile800 = c('23482744', '23482751', '23482758', '23482765')
 ))
 
+files_plot_206 <- list(
+  edffile = c("23608114", "23608135", "23608145", "23608174", "23608190", "23608198"),
+  eegfile = c( "e206S001R01", "e206S001R02", "e206S001R03", "e206S001R05", "e206S001R06", "e206S001R07"))
+
+
+
+
 
 # for superplot 
 
@@ -56,6 +63,15 @@ exp205 <- list(
   file23598120 = '23598128',
   file23598120 = '23598136',
   file23598120 = '23598144')
+
+exp206 <- list(
+  edffile = "23608114",
+  edffile = "23608135",
+  edffile = "23608145",
+  edffile = "23608163",
+  edffile = "23608174",
+  edffile = "23608190",
+  edffile = "23608198")
 
 j.files800 <- list(
   f23476900 = "23476900",
@@ -140,6 +156,14 @@ new.plot.all <- function(exp)
   }
 }
 
+extract.actions.all <- function(exp)
+{
+  for (file in exp)
+  {
+    extract.actions(file)
+  }
+}
+
 
 #for check.sync
 
@@ -167,6 +191,15 @@ files205 <- list(
   list(edffile = "23598128", eegfile = "e205S001R05"),
   list(edffile = "23598136", eegfile = "e205S001R06"),
   list(edffile = "23598144", eegfile = "e205S001R07"))
+
+files206 <- list(
+  list(edffile = "23608114", eegfile = "e206S001R01"),
+  list(edffile = "23608135", eegfile = "e206S001R02"),
+  list(edffile = "23608145", eegfile = "e206S001R03"),
+  #list(edffile = "23608163", eegfile = "e206S001R04"),
+  list(edffile = "23608174", eegfile = "e206S001R05"),
+  list(edffile = "23608190", eegfile = "e206S001R06"),
+  list(edffile = "23608198", eegfile = "e206S001R07"))
 
 
 files103 <- list(

@@ -46,8 +46,10 @@ new.epocher <- function(edffile,eegfile, t1=-500, t2=1000, ev1, ev2)
   ev2 <- str_filter(lines, ev2)
   ev2.times <- sapply(ev2, function(i) as.numeric(i[[2]]) - first_sync - fixation.duration)
   
-  count.index <- which(data$signal[,15]!=0)
-  count15 <- which(data$signal[count.index,15]==15)
+  last.ch <- dim(data$signal)[[2]]
+  
+  count.index <- which(data$signal[,last.ch]!=0)
+  count15 <- which(data$signal[count.index,last.ch]==15)
   if (length(count15)>1)
   {
     ref.point <- (count15[length(count15)-1])-1
@@ -63,7 +65,17 @@ new.epocher <- function(edffile,eegfile, t1=-500, t2=1000, ev1, ev2)
   epo.ev1 <- filt.and.epo(newsi, samplingRate, ev1.times, t1, t2)
   epo.ev2 <- filt.and.epo(newsi, samplingRate, ev2.times, t1, t2)
   
-  res <- list(epo.ev1 = epo.ev1, epo.ev2 = epo.ev2, samplingRate = samplingRate, type1 = type1, type2 = type2)
+  chans <- data$parameters$ChannelNames
+  channels <- c(which(chans == "P3"),
+                which(chans == "P4"),
+                which(chans == "O1"),
+                which(chans == "O2"),
+                which(chans == "HEOG_L"),
+                which(chans == "HEOG_R"),
+                which(chans == "VEOG_B"))
+  
+  res <- list(epo.ev1 = epo.ev1, epo.ev2 = epo.ev2, samplingRate = samplingRate,
+              type1 = type1, type2 = type2, channels = channels, fixation.duration = fixation.duration)
   
   return(res)
 }
@@ -87,14 +99,12 @@ new.plot.epo <- function(edffile, eegfile, ev1, ev2, t1=-500, t2=1000)
   
   df <- data.frame(mode = c(rep(res$type1,nrow(meanEpo1)), rep(res$type2,nrow(meanEpo2))),
                   t=c(t,t),
-                  P3 = c(meanEpo1[,5], meanEpo2[,5]),
-                  P4 = c(meanEpo1[,6], meanEpo2[,6]),
-                  O1 = c(meanEpo1[,7], meanEpo2[,7]),
-                  O2 = c(meanEpo1[,8], meanEpo2[,8]),
-                  HeOGl = c(meanEpo1[,11], meanEpo2[,11]),
-                  HeOGr = c(meanEpo1[,12], meanEpo2[,12]),
-                  VUp = c(meanEpo1[,13], meanEpo2[,13]),
-                  Vdn = c(meanEpo1[,14], meanEpo2[,14]))
+                  P3 = c(meanEpo1[,res$channels[1]], meanEpo2[,res$channels[1]]),
+                  P4 = c(meanEpo1[,res$channels[2]], meanEpo2[,res$channels[2]]),
+                  O1 = c(meanEpo1[,res$channels[3]], meanEpo2[,res$channels[3]]),
+                  O2 = c(meanEpo1[,res$channels[4]], meanEpo2[,res$channels[4]]),
+                  HeOGl = c(meanEpo1[,res$channels[5]], meanEpo2[,res$channels[5]]),
+                  Vdn = c(meanEpo1[,res$channels[7]], meanEpo2[,res$channels[7]]))
     
  
   plP3 <- plot_ch(df, "P3")  
@@ -102,20 +112,18 @@ new.plot.epo <- function(edffile, eegfile, ev1, ev2, t1=-500, t2=1000)
   plO1 <- plot_ch(df, "O1")  
   plO2 <- plot_ch(df, "O2")
   plHeOGl <- plot_ch(df, "HeOGl", -50, 50)
-  plHeOGr <- plot_ch(df, "HeOGr", -50, 50)
-  plVUp <- plot_ch(df, "VUp", -50, 50)
   plVdn <- plot_ch(df, "Vdn", -50, 50)
   
 
   grid.arrange(plP3, plP4, plO1, plO2,
-               plHeOGl, plHeOGr, plVUp, plVdn,               
-               ncol=2, heights=0.5, main = sprintf('file %s', eegfile),
+               plHeOGl, plVdn,               
+               ncol=2, heights=0.5, main = sprintf('file %s\nfix.dur = %s ms', eegfile, fixation.duration),
                sub = sprintf('nEpo %s=%.0f\nnEpo %s=%.0f',
                              levels(df$mode)[[2]], dim(epo.ev1)[[3]],
                              levels(df$mode)[[1]], dim(epo.ev2)[[3]]))
   
   pl <- arrangeGrob(plP3, plP4, plO1, plO2,
-                    plHeOGl, plHeOGr, plVUp, plVdn,               
+                    plHeOGl, plVdn,               
                     ncol=2, heights=0.5, main = sprintf('file %s', eegfile),
                     sub = sprintf('nEpo %s=%.0f\nnEpo %s=%.0f',
                                   levels(df$mode)[[2]], dim(epo.ev1)[[3]],
