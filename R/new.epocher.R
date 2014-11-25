@@ -72,10 +72,10 @@ new.epocher <- function(edffile,eegfile, t1=-500, t2=1000, ev1, ev2)
   }
   else
   {
-    channels <- c(which(chans == "P3"),
-                  which(chans == "P4"),
-                  which(chans == "O1"),
-                  which(chans == "O2"),
+    channels <- c(which(chans == "PO3"),
+                  which(chans == "PO4"),
+                  which(chans == "PO7"),
+                  which(chans == "PO8"),
                   which(chans == "HEOG_L"),
                   which(chans == "HEOG_R"),
                   which(chans == "VEOG_B"))
