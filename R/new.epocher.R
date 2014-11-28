@@ -45,21 +45,7 @@ new.epocher <- function(edffile,eegfile, t1=-500, t2=1000, ev1, ev2)
   ev2 <- str_filter(lines, ev2)
   ev2.times <- sapply(ev2, function(i) as.numeric(i[[2]]) - first_sync - fixation.duration)
   
-  last.ch <- dim(data$signal)[[2]]
-  
-  count.index <- which(data$signal[,last.ch]!=0)
-  count15 <- which(data$signal[count.index,last.ch]==15)
-  if (length(count15)>1)
-  {
-    ref.point <- (count15[length(count15)-1])-1
-  }
-  else
-  {
-    ref.point <- (count15[length(count15)])-1
-  }
-  third.bit <- count.index[ref.point]
-  
-  newsi <- data$signal[third.bit:length(data$signal[,1]),]
+  newsi <- cut.eeg(data)
   
   epo.ev1 <- filt.and.epo(newsi, samplingRate, ev1.times, t1, t2)
   epo.ev2 <- filt.and.epo(newsi, samplingRate, ev2.times, t1, t2)
