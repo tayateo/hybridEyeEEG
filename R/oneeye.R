@@ -37,13 +37,16 @@
   events$stTime <- events$stTime - timeLimit$begin
   events$enTime <- events$enTime - timeLimit$begin
   
+  fixation.duration <- as.numeric((str_filter(events$message, 'fixationDuration.+:([[:digit:]]+)'))[[1]][[2]])
+  
   list(
     samples = eyeData,
     events = events,
     samplingRate = data$begin$sampleRate,
     experimentDur = timeLimit$end - timeLimit$begin,
     sync_timestamp = timeLimit$begin,
-    pulses = pulses
+    pulses = pulses,
+    fixation.duration = fixation.duration
     )
 }
 
