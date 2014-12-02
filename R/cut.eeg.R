@@ -1,3 +1,6 @@
+#'
+#'Cuts eeg signal bt third sync point in the last channel
+#'
 cut.eeg <- function(data)
   
 {

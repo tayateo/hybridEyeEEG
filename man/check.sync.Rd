@@ -9,6 +9,8 @@ check.sync(edffile, eegfile)
 \item{edffile}{an .edf file name without an extesion}
 
 \item{eegfile}{a .dat file name without an extesion}
+
+\item{channel_with_sync}{- a channel in eeg, containing synchronization timestamps}
 }
 \value{
 a table with all sync points and their timestamps for both files.

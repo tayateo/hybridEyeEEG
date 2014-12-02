@@ -1,3 +1,5 @@
+#' Extracts file names from the meta files. Needs recognized structure from meta.json 
+
 brownie.extract.file.names <- function(exp.meta)
 {
   l <- list()

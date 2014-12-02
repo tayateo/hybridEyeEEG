@@ -1,4 +1,3 @@
-
 global <- new.env()
 
 set.brownie.root <- function(path)
