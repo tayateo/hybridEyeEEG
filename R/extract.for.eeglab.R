@@ -13,12 +13,9 @@ extract.actions <- function(filename, new.block.diff = T)
   fixation.duration <- as.numeric((str_filter(lines, '.+fixationDuration\":([[:digit:]]+)'))[[1]][[2]])
   
   blockedMove <- str_filter(lines, '.+"blockedMove".+time += ([[:digit:]]+)')
-  SRfix <- str_filter(lines, 'SFIX.+ ([[:digit:]]+)')
-  endSac <- str_filter(lines, 'ESACC.+ [[:digit:]]+\\t([[:digit:]]+)')
-  startSac <- str_filter(lines, 'SSACC.+ ([[:digit:]]+)')
   button.press <- str_filter(lines, '.+"ClickedToUnlock".+time += ([[:digit:]]+)')
   ball.choose <- str_filter(lines, '.+"ballSelect".+time += ([[:digit:]]+)')
-  fix.event <- str_filter(lines, '.+fixation in region.+time += ([[:digit:]]+)')
+  fix.event <- str_filter(lines, 'fixation in region.+time += ([[:digit:]]+)')
   random.block.starts <- str_filter(lines, '.+"random_block_starts".+time += ([[:digit:]]+)')
   random.block.ends <- str_filter(lines, '.+"random_block_ends".+time += ([[:digit:]]+)')
   
@@ -44,9 +41,9 @@ extract.actions <- function(filename, new.block.diff = T)
   random.block.ends <- sapply(random.block.ends, function(i) (as.numeric(i[[2]])- first_sync)/sRate)
   
   #SR events
-  SRfix.times <- sapply(SRfix, function(i) (as.numeric(i[[2]])- first_sync)/sRate)
-  endSac.times <- sapply(endSac, function(i) (as.numeric(i[[2]])- first_sync)/sRate)
-  startSac.times <- sapply(startSac, function(i) (as.numeric(i[[2]])- first_sync)/sRate)
+  SRfix.times <- ans$SRstartFix/sRate
+  endSac.times <- ans$SRendSacc/sRate
+  startSac.times <- ans$SRstartSacc/sRate
   
   
   
@@ -109,11 +106,11 @@ extract.actions <- function(filename, new.block.diff = T)
   }
 
   
-  for.eeglab = rbind(for.eeglab, data.frame(Latency = c(SRfix.times,endSac.times,fix.times, SRfix.times),
+  for.eeglab = rbind(for.eeglab, data.frame(Latency = c(SRfix.times, endSac.times, fix.times, startSac.times),
                      Type = c(rep("SRfix", length(SRfix.times)),
                      rep("SRSaccEnd", length(endSac.times)),
                      rep("FixationStart", length(fix.times)),
-                     rep("SRsaccStart", length(SRfix.times)))))
+                     rep("SRsaccStart", length(startSac.times)))))
 
   for.eeglab <- for.eeglab[order(for.eeglab$Latency),]
   

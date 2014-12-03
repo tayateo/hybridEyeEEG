@@ -39,6 +39,11 @@
   
   fixation.duration <- as.numeric((str_filter(events$message, 'fixationDuration.+:([[:digit:]]+)'))[[1]][[2]])
   
+  SRstartSacc <- data$events[data$events$type=='startsacc' , 'stTime'] - timeLimit$begin
+  SRendSacc <- data$events[data$events$type=='endsacc' , 'stTime'] - timeLimit$begin
+  SRstartFix <- data$events[data$events$type=='startfix' , 'stTime'] - timeLimit$begin
+  SRendFix <- data$events[data$events$type=='endfix' , 'stTime'] - timeLimit$begin
+  
   list(
     samples = eyeData,
     events = events,
@@ -46,7 +51,11 @@
     experimentDur = timeLimit$end - timeLimit$begin,
     sync_timestamp = timeLimit$begin,
     pulses = pulses,
-    fixation.duration = fixation.duration
+    fixation.duration = fixation.duration,
+    SRstartSacc = SRstartSacc[SRstartSacc>0],
+    SRendSacc = SRendSacc[SRendSacc>0],
+    SRstartFix = SRstartFix[SRstartFix>0],
+    SRendFix = SRendFix[SRendFix>0]
     )
 }
 
