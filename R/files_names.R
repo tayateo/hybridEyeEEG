@@ -73,6 +73,16 @@ exp206 <- list(
   edffile = "23608190",
   edffile = "23608198")
 
+exp207 <- list(
+  edffile = "23626734",
+  edffile = "23626751",
+  edffile = "23626764",
+  edffile = "23626772",
+  edffile = "23626784",
+  edffile = "23626795",
+  edffile = "23626803"
+  )
+
 j.files800 <- list(
   f23476900 = "23476900",
   f23476916 =	"23476916",
@@ -201,6 +211,14 @@ files206 <- list(
   list(edffile = "23608190", eegfile = "e206S001R06"),
   list(edffile = "23608198", eegfile = "e206S001R07"))
 
+files207 <- list(  
+  list(edffile = "23626734", eegfile = "e207S001R01"),
+  list(edffile = "23626751", eegfile = "e207S001R03"),
+  list(edffile = "23626764", eegfile = "e207S001R04"),
+  list(edffile = "23626772", eegfile = "e207S001R05"),
+  list(edffile = "23626784", eegfile = "e207S001R06"),
+  list(edffile = "23626795", eegfile = "e207S001R07"),
+  list(edffile = "23626803", eegfile = "e207S001R08"))
 
 files103 <- list(
   list(edffile = "23476936", eegfile = "e103S001R07"),
