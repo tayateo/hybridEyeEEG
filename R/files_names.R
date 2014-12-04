@@ -162,7 +162,7 @@ new.plot.all <- function(exp)
 {
   for(files in exp)
   {
-    new.plot.epo(files$edffile, files$eegfile, 'btn', 'ball')
+    new.plot.epo(files$edffile, files$eegfile, 'btn', 'block_ball')
   }
 }
 

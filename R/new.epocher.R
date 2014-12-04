@@ -10,8 +10,8 @@ new.epocher <- function(edffile,eegfile, t1=-500, t2=1000, ev1, ev2)
          moveTo = {ev1 = '"ballMove".+time += ([[:digit:]]+)'},
          inBlocked = {ev1 = '"BoardPositionClickedInBlockedMode".+time += ([[:digit:]]+)'},
          block_ball = {ev1 = '"BallClickedInBlockedMode".+time += ([[:digit:]]+)'},
-         block_board = {ev1 = '"BoardClickedInBlockedMode".+time += ([[:digit:]]+)'})
-  
+         block_board = {ev1 = '"BoardClickedInBlockedMode".+time += ([[:digit:]]+)'},
+         all.block.events = {ev1 = "all"})
   
   type2 = ev2
   
@@ -22,7 +22,8 @@ new.epocher <- function(edffile,eegfile, t1=-500, t2=1000, ev1, ev2)
          moveTo = {ev2 = '"ballMove".+time += ([[:digit:]]+)'},
          inBlocked = {ev2 = '"BoardPositionClickedInBlockedMode".+time += ([[:digit:]]+)'},
          block_ball = {ev2 = '"BallClickedInBlockedMode".+time += ([[:digit:]]+)'},
-         block_board = {ev2 = '"BoardClickedInBlockedMode".+time += ([[:digit:]]+)'})
+         block_board = {ev2 = '"BoardClickedInBlockedMode".+time += ([[:digit:]]+)'},
+         all.block.events = {ev2 = "all"})
   
   
   
@@ -39,16 +40,37 @@ new.epocher <- function(edffile,eegfile, t1=-500, t2=1000, ev1, ev2)
   
   fixation.duration <- as.numeric((str_filter(lines, 'fixationDuration.+:([[:digit:]]+)'))[[1]][[2]])
   
-  ev1 <- str_filter(lines, ev1)
-  ev1.times <- sapply(ev1, function(i) as.numeric(i[[2]]) - first_sync - fixation.duration)
+  if(ev1 == "all")
+  {
+    block_ball = str_filter(lines, '"BallClickedInBlockedMode".+time += ([[:digit:]]+)')
+    block_board = str_filter(lines, '"BoardClickedInBlockedMode".+time += ([[:digit:]]+)')
+    ev1.times <- sort(unlist(c(sapply(block_ball, function(i) as.numeric(i[[2]]) - first_sync - fixation.duration),
+                   sapply(block_board, function(i) as.numeric(i[[2]]) - first_sync - fixation.duration))))
+  }
+  else
+  {
+    ev1 <- str_filter(lines, ev1)
+    ev1.times <- sapply(ev1, function(i) as.numeric(i[[2]]) - first_sync - fixation.duration)
+  }
   
-  ev2 <- str_filter(lines, ev2)
-  ev2.times <- sapply(ev2, function(i) as.numeric(i[[2]]) - first_sync - fixation.duration)
+  if(ev2 == "all")
+  {
+    block_ball = str_filter(lines, '"BallClickedInBlockedMode".+time += ([[:digit:]]+)')
+    block_board = str_filter(lines, '"BoardClickedInBlockedMode".+time += ([[:digit:]]+)')
+    ev2.times <- sort(unlist(c(sapply(block_ball, function(i) as.numeric(i[[2]]) - first_sync - fixation.duration),
+                        sapply(block_board, function(i) as.numeric(i[[2]]) - first_sync - fixation.duration))))
+  }
+  else
+  {
+    ev2 <- str_filter(lines, ev2)
+    ev2.times <- sapply(ev2, function(i) as.numeric(i[[2]]) - first_sync - fixation.duration)
+  }
+  
   
   newsi <- cut.eeg(data)
   
-  epo.ev1 <- filt.and.epo(newsi, samplingRate, ev1.times, t1, t2)
-  epo.ev2 <- filt.and.epo(newsi, samplingRate, ev2.times, t1, t2)
+  epo.ev1 <- filt.and.epo(newsi, samplingRate, ev1.times, data, t1, t2)
+  epo.ev2 <- filt.and.epo(newsi, samplingRate, ev2.times, data, t1, t2)
   
   chans <- data$parameters$ChannelNames
   
@@ -58,8 +80,8 @@ new.epocher <- function(edffile,eegfile, t1=-500, t2=1000, ev1, ev2)
   }
   else
   {
-    channels <- c(which(chans == "PO3"),
-                  which(chans == "PO4"),
+    channels <- c(which(chans == "P0z"),
+                  which(chans == "Oz"),
                   which(chans == "PO7"),
                   which(chans == "PO8"),
                   which(chans == "HEOG_L"),

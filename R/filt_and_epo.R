@@ -1,4 +1,4 @@
-filt.and.epo <- function(signal, samplingRate, timestamps, t1 = -1000, t2 = 1000)
+filt.and.epo <- function(signal, samplingRate, timestamps, data, t1 = -1000, t2 = 1000)
 {
   
   #for butter
@@ -15,9 +15,20 @@ filt.and.epo <- function(signal, samplingRate, timestamps, t1 = -1000, t2 = 1000
 #     signal[i, ] <- (filtfilt(notch,signal[i, ]))
 #   }
   
-  k <- floor(timestamps/1000*samplingRate)
-  
   epoL <- t2-t1+1
+  
+  if(length(timestamps) == 0)
+  {
+    epo <-array(dim = c(epoL, ncol(signal),length(timestamps)))
+    return(epo)
+  }
+  
+  ref <- ( signal[, which(data$parameters$ChannelNames == "A1")] +
+             signal[, which(data$parameters$ChannelNames == "A2")] ) / 2
+  
+  signal <- signal - ref
+  
+  k <- floor(timestamps/1000*samplingRate)
   
   
   k<-k[k+t1>=1 & (k+t2 <=nrow(signal))]
