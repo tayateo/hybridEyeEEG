@@ -119,7 +119,7 @@ extract.actions <- function(filename, new.block.diff = T)
   #for.eeglab <- extract.saccades(for.eeglab, 0.1)
   
   
-  write.table(for.eeglab, sprintf('eventsLatencies%s.ascii', filename), row.names = F, quote = F)
+  #write.table(for.eeglab, sprintf('eventsLatencies%s.ascii', filename), row.names = F, quote = F)
   
   return(for.eeglab)
   
