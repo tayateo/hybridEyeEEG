@@ -9,7 +9,7 @@ extract.actions.alb <- function(filename, new.block.diff = T)
   
   lines <- ans$events$message
   
-  sRate <- ans$samplingRate
+  sRate <- 1000
 
   fixation.duration <- as.numeric((str_filter(lines, '.+fixationDuration\":([[:digit:]]+)'))[[1]][[2]])
   
