@@ -9,7 +9,7 @@ extract.actions.alb <- function(filename, new.block.diff = T)
   
   lines <- ans$events$message
   
-  sRate <- as.numeric((str_filter(lines, '^SAMPLES.+RATE\\t([[:digit:]]+)'))[[1]][[2]])
+  sRate <- ans$samplingRate
 
   fixation.duration <- as.numeric((str_filter(lines, '.+fixationDuration\":([[:digit:]]+)'))[[1]][[2]])
   
@@ -80,15 +80,29 @@ extract.actions.alb <- function(filename, new.block.diff = T)
   {
     ball_in_blocked <- str_filter(lines, '+"BallClickedInBlockedMode".+time += ([[:digit:]]+)')
     board_in_blocked <- str_filter(lines, '+"BoardClickedInBlockedMode".+time += ([[:digit:]]+)')
+    ball_in_pause <- str_filter(lines, '+"BallClickedInPause".+time += ([[:digit:]]+)')
+    board_in_pause <- str_filter(lines, '+"BoardClickedInPause".+time += ([[:digit:]]+)')
+    
     ball_in_blocked <- extr.num( ball_in_blocked , first_sync, fixation.duration, sRate)
     board_in_blocked <- extr.num( board_in_blocked , first_sync, fixation.duration, sRate)
+    ball_in_pause <- extr.num( ball_in_pause , first_sync, fixation.duration, sRate)
+    board_in_pause <- extr.num( board_in_pause , first_sync, fixation.duration, sRate)
+    
     if(length(ball_in_blocked)!=0)
     {
       for.eeglab <- rbind(for.eeglab, data.frame(Latency = ball_in_blocked, Type = rep("msgBallClickedInBlockedMode", length(ball_in_blocked))))  
     }
-    else if(length(board_in_blocked)!=0)
+    if(length(board_in_blocked)!=0)
     {
       for.eeglab <- rbind(for.eeglab, data.frame(Latency = board_in_blocked, Type = rep("msgBoardClickedInBlockedMode", length(board_in_blocked))))
+    }
+    if(length(ball_in_pause)!=0)
+    {
+      for.eeglab <- rbind(for.eeglab, data.frame(Latency = ball_in_pause, Type = rep("msgBallClickedInPause", length(ball_in_pause))))
+    }
+    if(length(board_in_pause)!=0)
+    {
+      for.eeglab <- rbind(for.eeglab, data.frame(Latency = board_in_pause, Type = rep("msgBoardClickedInPause", length(board_in_pause))))
     }
   }
   

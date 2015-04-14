@@ -9,7 +9,8 @@ extract.actions <- function(filename, new.block.diff = T)
   
   lines <- ans$events$message
   
-  sRate <- as.numeric((str_filter(lines, '^SAMPLES.+RATE\\t([[:digit:]]+)'))[[1]][[2]])
+  sRate <- ans$samplingRate
+  
   fixation.duration <- as.numeric((str_filter(lines, '"fixationDuration\":([[:digit:]]+)'))[[1]][[2]])
   quick.fixation.duration <- as.numeric((str_filter(lines, '"quickFixationDuration\":([[:digit:]]+)'))[[1]][[2]])
   
@@ -211,6 +212,6 @@ mark.saccades <- function(for.eeglab)
 
 extr.num <- function(extr, first_sync, fixation.duration, sRate)
 {
-  ans <- sapply(extr, function(i) (as.numeric(i[[2]])- first_sync - fixation.duration)/sRate/1000);
+  ans <- sapply(extr, function(i) (as.numeric(i[[2]])- first_sync - fixation.duration)/sRate);
   unlist(ans)
 }
