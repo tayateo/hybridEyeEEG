@@ -211,6 +211,6 @@ mark.saccades <- function(for.eeglab)
 
 extr.num <- function(extr, first_sync, fixation.duration, sRate)
 {
-  ans <- sapply(extr, function(i) (as.numeric(i[[2]])- first_sync - fixation.duration)/sRate);
+  ans <- sapply(extr, function(i) (as.numeric(i[[2]])- first_sync - fixation.duration)/sRate/1000);
   unlist(ans)
 }
