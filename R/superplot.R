@@ -11,7 +11,7 @@ superplot <- function(filename, str, t1 = -2000, t2 = 2000)
 #   'inBlocked - btn'
   
   
-  ans <- load.one.eye(sprintf("%s.edf",filename))
+  ans <- load.one.eye(sprintf("%s.edf",filename$edffile))
   
   points <- ans$samples
   lines <- ans$events$message
@@ -21,7 +21,7 @@ superplot <- function(filename, str, t1 = -2000, t2 = 2000)
   
   speed.of.eye <- c(sqrt( (diff(points[,2])^2) + (diff(points[,3])^2) ), 0)
   points$speed <- speed.of.eye
-  write.table(points, file = sprintf("file%s.csv", filename), row.names = F)
+  write.table(points, file = sprintf("file%s.csv", filename$edffile), row.names = F)
   
   
   type = str
@@ -110,9 +110,9 @@ superplot <- function(filename, str, t1 = -2000, t2 = 2000)
      {
        pl <- arrangeGrob(l[[10]], l[[9]], l[[8]], l[[7]], l[[6]],
                    l[[5]], l[[4]], l[[3]], l[[2]], l[[1]], ncol = 1 ,
-                   main = textGrob(sprintf('%s-%.0f\ntype %s', filename, ceiling(i/2)/10, type),
+                   main = textGrob(sprintf('%s-%.0f\ntype %s', filename$edffile, ceiling(i/2)/10, type),
                    gp=gpar(fontsize=15)))
-       ggsave(filename=sprintf('file%s-%s-%.0f.jpg', filename, type, ceiling(i/2)/10), plot=pl)
+       ggsave(filename=sprintf('file%s-%s-%.0f.jpg', filename$edffile, type, ceiling(i/2)/10), plot=pl)
      }
    }
 }

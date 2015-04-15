@@ -83,6 +83,19 @@ exp207 <- list(
   edffile = "23626803"
   )
 
+
+
+exp208 <- list(
+  edffile = "23817008",
+  edffile = "23817026",
+  edffile = "23817036",
+  edffile = "23817049",
+  edffile = "23817058",
+  edffile = "23817080",
+  edffile = "23817096",
+  edffile = "23817087"
+)
+
 j.files800 <- list(
   f23476900 = "23476900",
   f23476916 =	"23476916",
@@ -174,6 +187,14 @@ extract.actions.all <- function(exp)
   }
 }
 
+extract.actions.all.alb <- function(exp)
+{
+  for (file in exp)
+  {
+    extract.actions.alb(file)
+  }
+}
+
 
 #for check.sync
 
@@ -219,6 +240,16 @@ files207 <- list(
   list(edffile = "23626784", eegfile = "e207S001R06"),
   list(edffile = "23626795", eegfile = "e207S001R07"),
   list(edffile = "23626803", eegfile = "e207S001R08"))
+
+files208 <- list(  
+  list(edffile = "23817008", eegfile = "e208S001R01"),
+  list(edffile = "23817026", eegfile = "e208S001R02"),
+  list(edffile = "23817036", eegfile = "e208S001R03"),
+  list(edffile = "23817049", eegfile = "e208S001R04"),
+  list(edffile = "23817058", eegfile = "e208S001R05"),
+  list(edffile = "23817080", eegfile = "e208S001R06"),
+  list(edffile = "23817096", eegfile = "e208S001R07"),
+  list(edffile = "23817087", eegfile = "e208S001R08"))
 
 files103 <- list(
   list(edffile = "23476936", eegfile = "e103S001R07"),
