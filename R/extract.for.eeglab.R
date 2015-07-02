@@ -1,4 +1,4 @@
-extract.actions <- function(filename, new.block.diff = T, quick.exict = F)
+extract.actions <- function(filename, new.block.diff = T)
   
   #sSearchRegion - to foem interval  sSearchRegion +/- saccade latency to search in, in seconds
 {
@@ -12,15 +12,7 @@ extract.actions <- function(filename, new.block.diff = T, quick.exict = F)
   sRate <- 1000
   
   fixation.duration <- as.numeric((str_filter(lines, '"fixationDuration\":([[:digit:]]+)'))[[1]][[2]])
-  if(quick.exict){
-    quick.fixation.duration <- as.numeric((str_filter(lines, '"quickFixationDuration\":([[:digit:]]+)'))[[1]][[2]])
-    
-    quick.click <- str_filter(lines, '^quick fixation in region.+time += ([[:digit:]]+)')
-    do.click <- str_filter(lines, '^received click.+time += ([[:digit:]]+)')
-    
-    quick.click <- extr.num(quick.click, first_sync, quick.fixation.duration, sRate)
-    do.click <- unlist(sapply(do.click, function(i) (as.numeric(i[[2]])- first_sync)/sRate))
-  }
+  quick.fixation.duration <- as.numeric((str_filter(lines, '"quickFixationDuration\":([[:digit:]]+)'))[[1]][[2]])
   
   blockedMove <- str_filter(lines, '.+"blockedMove".+time += ([[:digit:]]+)')
   button.press <- str_filter(lines, '.+"ClickedToUnlock".+time += ([[:digit:]]+)')
@@ -28,7 +20,8 @@ extract.actions <- function(filename, new.block.diff = T, quick.exict = F)
   fix.event <- str_filter(lines, '^fixation in region.+time += ([[:digit:]]+)')
   random.block.starts <- str_filter(lines, '.+"random_block_starts".+time += ([[:digit:]]+)')
   random.block.ends <- str_filter(lines, '.+"random_block_ends".+time += ([[:digit:]]+)')
-
+  quick.click <- str_filter(lines, '^quick fixation in region.+time += ([[:digit:]]+)')
+  do.click <- str_filter(lines, '^received click.+time += ([[:digit:]]+)')
   
  
 
@@ -41,7 +34,8 @@ extract.actions <- function(filename, new.block.diff = T, quick.exict = F)
   #here we are taking the third synchronization bit to use
   #it as the reference point in eeg file
   
-  
+  quick.click <- extr.num(quick.click, first_sync, quick.fixation.duration, sRate)
+  do.click <- unlist(sapply(do.click, function(i) (as.numeric(i[[2]])- first_sync)/sRate))
     
   button.times <- extr.num(button.press, first_sync, fixation.duration, sRate)
   ball.times <- extr.num(ball.choose , first_sync, fixation.duration, sRate)
@@ -62,12 +56,14 @@ extract.actions <- function(filename, new.block.diff = T, quick.exict = F)
   
   
   for.eeglab <- data.frame(Latency = c(button.times,ball.times,
-                                       ball.move.times, max.reached.times),
+                                       ball.move.times, max.reached.times, quick.click,
+                                       do.click),
                            Type = c(rep("msgbuttonPressed", length(button.times)), 
                                     rep("msgballChosen", length(ball.times)),
                                     rep("msgBallMoved", length(ball.move.times)),
-                                    rep("ReachedMax", length(max.reached.times))
-                                    ))
+                                    rep("ReachedMax", length(max.reached.times)),
+                                    rep("quick.click", length(quick.click)),
+                                    rep("do.click", length(do.click))))
   
   for.eeglab <- for.eeglab[order(for.eeglab$Latency),]
   for.eeglab$Type <- sapply(for.eeglab$Type, as.character)
@@ -88,13 +84,6 @@ extract.actions <- function(filename, new.block.diff = T, quick.exict = F)
     {
       for.eeglab <- rbind(for.eeglab, data.frame(Latency = clicked.in.blocked.mode, Type = rep("msgClickedInBlockMode", length(clicked.in.blocked.mode))))
     }
-  }
-  else if(quick.exict){
-    for.eeglab <- rbind(for.eeglab, data.frame(Latency = quick.click, Type = rep("quick.click", length(quick.click))
-                                               ))
-    for.eeglab <- rbind(for.eeglab, data.frame(Latency = do.click, Type = rep("do.click", length(do.click))
-    ))
-    
   }
   else
   {
