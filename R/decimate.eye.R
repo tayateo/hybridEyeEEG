@@ -14,7 +14,7 @@
 decimate.eye <- function(filename, q, na.code = "NaN")
 {
   
-  filename <- sprintf("%s.edf",filename)
+  #filename <- sprintf("%s.edf",filename)
   
   #q  - integer factor to downsample by.
 
