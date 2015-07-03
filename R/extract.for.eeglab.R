@@ -87,8 +87,8 @@ extract.actions <- function(filename, new.block.diff = T)
   }
   else
   {
-    ball_in_blocked <- str_filter(lines, '+"BallClickedInBlockedMode".+time += ([[:digit:]]+)')
-    board_in_blocked <- str_filter(lines, '+"BoardClickedInBlockedMode".+time += ([[:digit:]]+)')
+    ball_in_blocked <- str_filter(lines, '.+"BallClickedInBlockedMode".+time += ([[:digit:]]+)')
+    board_in_blocked <- str_filter(lines, '.+"BoardClickedInBlockedMode".+time += ([[:digit:]]+)')
     ball_in_blocked <- extr.num( ball_in_blocked , first_sync, fixation.duration, sRate)
     board_in_blocked <- extr.num( board_in_blocked , first_sync, fixation.duration, sRate)
     if(length(ball_in_blocked)!=0)
